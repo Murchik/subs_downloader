@@ -1,8 +1,7 @@
 import yaml
 import os
-
-import tqdm
 import requests
+from tqdm import tqdm
 
 
 def countFiles(path: str, name: str, ext: str) -> int:
@@ -16,9 +15,14 @@ def countFiles(path: str, name: str, ext: str) -> int:
     return count
 
 
-def downloadFromURL(url: str, outputName: str):
+def downloadFromURL(url: str, outputName: str = ''):
     r = requests.get(url, stream=True)
-    with open(outputName, 'wb') as handle:
+
+    if outputName == '':
+        outputName = r.headers.get('Content-Disposition')
+        outputName = outputName.split(sep='=')[1].strip('"')
+
+    with open(fileName, 'wb') as handle:
         for data in tqdm(r.iter_content()):
             handle.write(data)
 
@@ -51,7 +55,6 @@ class EntrysManager:
         return self.entrys
 
     def downloadSubs(self):
-        # цикл: для каждого элемента списка
         for entry in self.entrys:
             # Найти папку
             path = animesDir + '\\' + entry.name
@@ -74,8 +77,6 @@ class EntrysManager:
             else:
                 print('Есть нескаченные субтитры: ' + entry.name)
 
-            # : конец цикла
-
 
 if __name__ == '__main__':
     animesDir = 'D:\Libraries\Videos\Anime'
@@ -86,12 +87,12 @@ if __name__ == '__main__':
     manager.loadYAML(animesDir + '\subs.yaml')
 
     # Для каждого элемента в списке скачать сабы
-    manager.downloadSubs()
+    # manager.downloadSubs()
 
     url = 'http://fansubs.ru/base.php?srt=13172'
-    fileName = 'Tensei shitara Ken Deshita.zip'
+    fileName = 'Tensei shitara Ken Deshita.rar'
 
-    # downloadFromURL(url, fileName)
+    downloadFromURL(url, fileName)
 
     # цикл: для каждого эл. списка на обновление
 
